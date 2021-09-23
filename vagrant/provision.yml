@@ -1,0 +1,78 @@
+---
+- hosts: all
+  become: yes
+  user: vagrant
+  vars:
+    - vagrant_home: /home/vagrant
+    - quartus_file_name: Quartus-lite-20.1.1.720-linux.tar
+    - quartus_directory: /home/vagrant/zx-deca/quartus
+  tasks:
+
+    - name: Updating installed packages
+      apt:
+        name: '*'
+        update_cache: yes
+        state: latest
+        force_apt_get: True
+
+    - name: Install the native development tools
+      apt:
+        name:
+          # ntpdate is need to update the time on the vagrant built machine when if falls
+          # out of sync with the host. e.g. `sudo ntpdate time.nist.gov`
+          - ntpdate
+          # Miscellaneous development tools
+          - git
+          - minicom
+          - emacs
+          - tree
+          # Desktop environment
+          - ubuntu-desktop
+          - virtualbox-guest-dkms
+          - virtualbox-guest-utils
+          - virtualbox-guest-x11
+          - firefox
+        state: latest
+        force_apt_get: True
+
+    - name: "Add the vagrant user to the dialout group so that it can access the Maker pHat serial device /dev/ttyUSB0"
+      user:
+        name: vagrant
+        groups:
+          - dialout
+          - tty
+        append: yes
+
+    - name: "Enable automatic logins"
+      template:
+        src: templates/custom.conf
+        dest: /etc/gdm3/custom.conf
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+
+    - name: "Configure access to the USB Blaster device for all users"
+      template:
+        src: templates/51-usbblaster.rules
+        dest: /etc/udev/rules.d/51-usbblaster.rules
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+
+    - name: "Extract Quartus"
+      unarchive:
+        src: "{{quartus_directory}}/{{quartus_file_name}}"
+        dest: "{{quartus_directory}}"
+        creates: "{{quartus_directory}}/components"
+
+    # The Quartus installation creates a desktop launcher, e.g. "/home/vagrant/Desktop/Quartus (Quartus Prime 20.1) Lite Edition.desktop",
+    # which we can use to determine if Quartus has already been installed...
+    - name: "Install Quartus"
+      shell: ./setup.sh --unattendedmodeui minimal --mode unattended --accept_eula 1
+      become_user: vagrant
+      args:
+        chdir: "{{quartus_directory}}/"
+        creates: "{{vagrant_home}}/Desktop/Quartus*.desktop"
+
+    # - name: Unconditionally reboot the machine with all defaults
+    #   reboot:
