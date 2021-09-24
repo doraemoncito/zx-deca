@@ -31,3 +31,5 @@
 *.out
 *.app
 vagrant/.vagrant
+quartus/*
+*.log

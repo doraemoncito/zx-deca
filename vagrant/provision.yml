@@ -8,14 +8,14 @@
     - quartus_directory: /home/vagrant/zx-deca/quartus
   tasks:
 
-    - name: Updating installed packages
+    - name: "Updating installed packages"
       apt:
         name: '*'
         update_cache: yes
         state: latest
         force_apt_get: True
 
-    - name: Install the native development tools
+    - name: "Install the desktop environment and development tools"
       apt:
         name:
           # ntpdate is need to update the time on the vagrant built machine when if falls
@@ -59,20 +59,41 @@
         group: root
         mode: u=rw,g=r,o=r
 
+    # [Tweaks for Vagrant boxes to prevent locking in the VM](https://gist.github.com/dragon788/a748d02ac5cec9fa8bc7)
+    - name: "Configure V< to prevent screen locking"
+      shell: |
+        # Disable screensaver (by setting time to never)
+        gsettings set org.gnome.desktop.session idle-delay 0
+        # Disable lock screen entirely
+        gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+
+    - name: "Copy theQuartus installtion script to the guest machine"
+      template:
+        src: templates/install_quartus.sh
+        dest: "{{vagrant_home}}/install_quartus.sh"
+        owner: vagrant
+        group: vagrant
+        mode: u=rx,g=r,o=r
+
     - name: "Extract Quartus"
       unarchive:
         src: "{{quartus_directory}}/{{quartus_file_name}}"
         dest: "{{quartus_directory}}"
         creates: "{{quartus_directory}}/components"
 
-    # The Quartus installation creates a desktop launcher, e.g. "/home/vagrant/Desktop/Quartus (Quartus Prime 20.1) Lite Edition.desktop",
-    # which we can use to determine if Quartus has already been installed...
-    - name: "Install Quartus"
-      shell: ./setup.sh --unattendedmodeui minimal --mode unattended --accept_eula 1
-      become_user: vagrant
-      args:
-        chdir: "{{quartus_directory}}/"
-        creates: "{{vagrant_home}}/Desktop/Quartus*.desktop"
+    # NOTE: When installing via Ansible, the Quartus installed seems unable to detect the fact that we have a complete
+    # desktop environment and omits the installation of the desktop shortcut (and possibly other things) so we'll have
+    # to ask the user to install Quartus from the console.
+    #
+    # - name: "Install Quartus"
+    #   shell: ./setup.sh --unattendedmodeui none --mode unattended --accept_eula 1
+    #   become_user: vagrant
+    #   args:
+    #     chdir: "{{quartus_directory}}/"
+    #     creates: "{{vagrant_home}}/Desktop/Quartus*.desktop"
 
-    # - name: Unconditionally reboot the machine with all defaults
-    #   reboot:
+    - name: "Reboot the machine"
+      shell: "sleep 5 && reboot"
+      async: 1
+      poll: 0
+
