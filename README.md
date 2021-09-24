@@ -2,10 +2,38 @@
 
 ZX Spectrum implementation on a DECA development board
 
-## Pre-requisites
+## Development environment pre-requisites
 
-- Vagrant
-- Ansible
+- [VirtualBox](https://www.virtualbox.org)
+- [Vagrant](https://www.vagrantup.com)
+- [Vagrant VirtualBox guest plug-in](https://github.com/dotless-de/vagrant-vbguest)
+- [Ansible](https://www.ansible.com)
+- [Intel's Quartus FPGA software](https://fpgasoftware.intel.com/?edition=lite)
+
+On macOS, the tools required to build the cross-compilation development environment for Raspberry Pi can be easily installed using the brew package manager. e.g.
+
+```sh
+echo
+echo "Installing the Brew package manager"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+echo
+echo "Installing VirtualBox"
+brew cask install virtualbox
+
+echo
+echo "Installing Vagrant"
+brew cask install vagrant
+
+# (optional) delete the installation of curl bundled with Vagrant if it causes problems when initialising Vagrant boxes
+sudo rm -f /opt/vagrant/embedded/bin/curl
+
+echo "Installing Vagrant's VirtualBox guest plug-in (https://github.com/dotless-de/vagrant-vbguest)"
+vagrant plugin install vagrant-vbguest
+
+echo "Installing the Ansible infrastructure tool"
+brew install ansible
+```
 
 ## Creating the development environment
 
@@ -33,10 +61,14 @@ If you have more than one network interface, Vagrant will ask you to select the 
 9) en4: Thunderbolt 4
 10) bridge0
 11) en7: USB 10/100/1000 LAN
+==> zx-deca-development-environment: When choosing an interface, it is usually the one that is
+==> zx-deca-development-environment: being used to connect to the internet.
+==> zx-deca-development-environment: 
+    zx-deca-development-environment: Which interface should the network bridge to? 
 ```
 
-Once the virtual machine has been provisioned and it is up and running, run the following command in the console on the guest OS:
+Once the virtual machine has been provisioned, rebooted and it is up and running, run the following command in a console window in the guest OS:
 
 ```sh
-./zx-deca/quartus/setup.sh --unattendedmodeui minimalWithDialogs --mode unattended --accept_eula 1
+./install_quartus.sh
 ```

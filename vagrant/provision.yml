@@ -59,15 +59,7 @@
         group: root
         mode: u=rw,g=r,o=r
 
-    # [Tweaks for Vagrant boxes to prevent locking in the VM](https://gist.github.com/dragon788/a748d02ac5cec9fa8bc7)
-    - name: "Configure V< to prevent screen locking"
-      shell: |
-        # Disable screensaver (by setting time to never)
-        gsettings set org.gnome.desktop.session idle-delay 0
-        # Disable lock screen entirely
-        gsettings set org.gnome.desktop.lockdown disable-lock-screen true
-
-    - name: "Copy theQuartus installtion script to the guest machine"
+    - name: "Copy theQuartus installation script to the guest machine"
       template:
         src: templates/install_quartus.sh
         dest: "{{vagrant_home}}/install_quartus.sh"
@@ -81,10 +73,14 @@
         dest: "{{quartus_directory}}"
         creates: "{{quartus_directory}}/components"
 
-    # NOTE: When installing via Ansible, the Quartus installed seems unable to detect the fact that we have a complete
-    # desktop environment and omits the installation of the desktop shortcut (and possibly other things) so we'll have
-    # to ask the user to install Quartus from the console.
-    #
+    # # [Tweaks for Vagrant boxes to prevent locking in the VM](https://gist.github.com/dragon788/a748d02ac5cec9fa8bc7)
+    # - name: "Configure V< to prevent screen locking"
+    #   shell: |
+    #     # Disable screensaver (by setting time to never)
+    #     gsettings set org.gnome.desktop.session idle-delay 0
+    #     # Disable lock screen entirely
+    #     gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+
     # - name: "Install Quartus"
     #   shell: ./setup.sh --unattendedmodeui none --mode unattended --accept_eula 1
     #   become_user: vagrant
@@ -92,8 +88,15 @@
     #     chdir: "{{quartus_directory}}/"
     #     creates: "{{vagrant_home}}/Desktop/Quartus*.desktop"
 
+    # - name: "Copy the Quartus desktop shortcut to the guest machine"
+    #   template:
+    #     src: "templates/Quartus (Quartus Prime 20.1) Lite Edition.desktop"
+    #     dest: "{{vagrant_home}}/Desktop/Quartus (Quartus Prime 20.1) Lite Edition.desktop"
+    #     owner: vagrant
+    #     group: vagrant
+    #     mode: u=rx,g=rx,o=rx
+
     - name: "Reboot the machine"
       shell: "sleep 5 && reboot"
       async: 1
       poll: 0
-
