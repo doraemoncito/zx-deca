@@ -1,6 +1,8 @@
 # zx-deca
 
-ZX Spectrum implementation on a DECA development board
+ZX Spectrum implementation on a DECA development board.
+
+Please note that this project no longer creates a VM with a graphics driver as this had significant performance implications, instead you'll need to connect to the virtual machine using remote desktop. 
 
 ## Development environment pre-requisites
 
@@ -9,6 +11,7 @@ ZX Spectrum implementation on a DECA development board
 - [Vagrant VirtualBox guest plug-in](https://github.com/dotless-de/vagrant-vbguest)
 - [Ansible](https://www.ansible.com)
 - [Intel's Quartus FPGA software](https://fpgasoftware.intel.com/?edition=lite)
+- [Microsoft remote desktop application for macOS](https://apps.apple.com/gb/app/microsoft-remote-desktop/id1295203466?mt=12)
 
 On macOS, the tools required to build the cross-compilation development environment for Raspberry Pi can be easily installed using the brew package manager. e.g.
 
@@ -67,8 +70,11 @@ If you have more than one network interface, Vagrant will ask you to select the 
     zx-deca-development-environment: Which interface should the network bridge to? 
 ```
 
-Once the virtual machine has been provisioned, rebooted and it is up and running, run the following command in a console window in the guest OS:
+Once the virtual machine has been provisioned, rebooted, and it is up and running, run the command shown below in a console window in the guest OS.  You can connect to the guest OS using Microsoft remote desktop and the [configuration file supplied with this project](vagrant/zx-deca-development-environment.rdp).
 
 ```sh
 ./install_quartus.sh
 ```
+
+- [ForoFPGA: Foro de cacharreo con FPGAs, CPLDs y demás tipos de lógica programable](http://www.forofpga.es/index.php)
+

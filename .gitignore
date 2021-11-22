@@ -33,3 +33,4 @@
 vagrant/.vagrant
 quartus/*
 *.log
+.idea
