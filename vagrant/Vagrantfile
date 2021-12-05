@@ -62,9 +62,11 @@ def usbfilter_add_if_not_exists(vb, vendor_id, product_id, revision, filter_name
             "--active", "yes",
             "--vendorid", vendor_id,
             "--productid", product_id,
-            "--revision", revision,
-            "--manufacturer", manufacturer_name,
-            "--product", product_name
+# SKIP MATCHING ON THESE PARAMETERS TO STOP THE FILTER SEARCH FROM BECOMING TOO NARROW AND PREVENTING SOME DEVICE LIKE
+# THE ALTERA USB BLASTER FROM BEING ATTACHED AUTOMATICALLY WHEN PLUGGED-IN.
+#             "--revision", revision,
+#             "--manufacturer", manufacturer_name,
+#             "--product", product_name
         ]
     # -- DEBUG ONLY --
     # else
@@ -149,7 +151,10 @@ Vagrant.configure("2") do |config|
             usbfilter_add_if_not_exists(vb, "0403", "6010", "0700", "Arrow USB Blaster [0700]", "Arrow", "Arrow USB Blaster")
 
             # Add the configuration for the DECA Altera USB Blaster interface
-            usbfilter_add_if_not_exists(vb, "09FB", "6010", "0139", "Altera Arrow MAX 10 DECA [0139]", "Altera", "Arrow MAX 10 DECA")
+            usbfilter_add_if_not_exists(vb, "09fb", "6010", "0001", "Altera [0001]", "Altera", "Altera")
+
+            # Add the configuration for the DECA Altera USB Blaster interface
+            usbfilter_add_if_not_exists(vb, "09fb", "6810", "0139", "Altera Arrow MAX 10 DECA [0139]", "Altera", "Arrow MAX 10 DECA")
         end
 
         # Set the environment variable DEBIAN_FRONTEND to "noninteractive" to prevent debconf from trying to open stdin.

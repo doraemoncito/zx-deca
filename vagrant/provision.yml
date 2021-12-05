@@ -3,12 +3,12 @@
   become: yes
   user: vagrant
   vars:
-    - VAGRANT_HOME: /home/vagrant
-    - ZX_DECA_DIRECTORY: {{VAGRANT_HOME}}/zx-deca
-    - QUARTUS_FILE_NAME: Quartus-lite-20.1.1.720-linux.tar
-    - QUARTUS_DIRECTORY: {{ZX_DECA_DIRECTORY}}/quartus
-    - USB_BLASTER_FILE_NAME: Arrow_USB_Programmer_2.5.1_linux64
-    - USB_BLASTER_DRIVER_URL: https://static6.arrow.com/aropdfconversion/arrowresources/9b447f3724e8bd6da5323a783f0b35850b5d55ae/{{USB_BLASTER_FILE_NAME}}.zip
+    - VAGRANT_HOME: "/home/vagrant"
+    - ZX_DECA_DIRECTORY: "{{VAGRANT_HOME}}/zx-deca"
+    - QUARTUS_FILE_NAME: "Quartus-lite-20.1.1.720-linux.tar"
+    - QUARTUS_DIRECTORY: "{{ZX_DECA_DIRECTORY}}/quartus"
+    - USB_BLASTER_FILE_NAME: "Arrow_USB_Programmer_2.5.1_linux64"
+    - USB_BLASTER_DRIVER_URL: "https://static6.arrow.com/aropdfconversion/arrowresources/9b447f3724e8bd6da5323a783f0b35850b5d55ae/{{USB_BLASTER_FILE_NAME}}.zip"
   tasks:
 
     - name: "Updating installed packages"
@@ -70,6 +70,7 @@
         owner: root
         group: root
         mode: u=rw,g=r,o=r
+        force: true
 
     - name: "Copy theQuartus installation script to the guest machine"
       template:
@@ -88,22 +89,22 @@
     - name: "Download the Arrow USB Blaster driver for CYC1000 application"
       get_url:
         url: "{{USB_BLASTER_DRIVER_URL}}"
-        dest: "{{ZX_DECA_DIRECTORY}}/tmp"
+        dest: "{{ZX_DECA_DIRECTORY}}/downloads/{{USB_BLASTER_FILE_NAME}}.zip"
         owner: vagrant
         group: vagrant
         mode: u=rwx,g=rx,o=rx
-        force: true
+        force: false
 
     - name: "Unpack the USB Blaster driver package"
       unarchive:
-        src: "{{ZX_DECA_DIRECTORY}}/tmp/{{USB_BLASTER_FILE_NAME}}.zip"
+        src: "{{ZX_DECA_DIRECTORY}}/downloads/{{USB_BLASTER_FILE_NAME}}.zip"
         dest: "{{ZX_DECA_DIRECTORY}}/tmp/{{USB_BLASTER_FILE_NAME}}"
         remote_src: yes
 
     - name: "Copy the USB Blaster driver binary to the Quartus directory"
       copy:
         src: "{{ZX_DECA_DIRECTORY}}/tmp/{{USB_BLASTER_FILE_NAME}}/libjtag_hw_arrow.so"
-        dest: "{{VAGRANT_HOME}}/vagrant/intelFPGA_lite/20.1/quartus/linux64/libjtag_hw_arrow.so"
+        dest: "{{VAGRANT_HOME}}/intelFPGA_lite/20.1/quartus/linux64/libjtag_hw_arrow.so"
         remote_src: yes
         owner: vagrant
         group: vagrant

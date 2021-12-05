@@ -34,3 +34,5 @@ vagrant/.vagrant
 quartus/*
 *.log
 .idea
+downloads
+tmp
